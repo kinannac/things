@@ -293,7 +293,7 @@ Dengan opa-server dihentikan, perintah cek (curl) dan cekcmd menghasilkan pesan 
 
 ## 13. Langkah berikutnya
 
-- [ ] Uji fail-closed lewat adapter.py dengan opa-server dimatikan (harus deny dan exit code 1).
+- [x] Uji fail-closed lewat adapter.py dengan opa-server dimatikan (harus deny dan exit code 1).
 - [ ] Uji ulang nomor 5 dan 10 dari batch 1, lalu jadikan test.
 - [ ] Tambahkan test untuk batch 2 (nomor 11 sampai 15).
 - [ ] Beri file test zona ask\_human; jalankan test di sandbox.
