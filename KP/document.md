@@ -10,7 +10,7 @@ Aturan ditulis dalam Rego (policy.rego). Daftar path, level autonomy, dan comman
 
 Status pengujian saat ini:
 
-- 32 unit test lulus (32/32).
+- 37 unit test lulus (37/37).
 - 6 skenario fixtures lewat curl sesuai prediksi.
 - 2 batch uji bypass (16 command) sesuai prediksi setelah perbaikan.
 - Belum dilakukan: uji fail-closed adapter, shadow mode dengan agent nyata, dan penegakan (enforce).
