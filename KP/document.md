@@ -1,6 +1,6 @@
 # Dokumentasi Framed Autonomy berbasis OPA untuk Agent AI
 
-Studi kasus: repo KasirKu (aplikasi PoS berbasis Bun + TypeScript). Status: tahap trial, belum terhubung ke agent nyata. Disusun: 19 Oktober 2026.
+Studi Kasus: Integrated dengan KasirKu -> akan diimplementasikan ke Agent AI
 
 ## 1. Ringkasan
 
