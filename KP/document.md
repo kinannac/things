@@ -167,6 +167,7 @@ Berlaku untuk aksi menulis (file.write) pada environment dev dengan level L1 ata
 - src/global.ts (memuat definisi global.permissions dan handle database)
 - Di bawah src/method\_function pada semua method (GET, POST, PATCH, DELETE): user.ts, users.ts, role.ts, roles.ts, profile.ts, serta file berawalan login, logout, dan password. Contoh: DELETE/user.ts dan DELETE/role.ts ikut terlarang
 - src/method\_function/GET/uar\_list.ts (daftar user berdasarkan role)
+- src/method\_function/PATCH/change\_password.ts (pola login, logout, dan password mencocokkan kata di mana saja dalam nama file)
 - Semua file.delete (tidak ada level yang diberi izin ini)
 
 ### 9.2 ASK\_HUMAN (butuh persetujuan manusia)
@@ -181,6 +182,7 @@ Berlaku untuk aksi menulis (file.write) pada environment dev dengan level L1 ata
 - scripts/\*\*
 - package.json, Dockerfile, docker-compose.yml, tsconfig.json, SECURITY.md
 - Semua path yang tidak ada di daftar mana pun, misalnya dist/**, tests/**, README.md, LICENSE, .gitignore (karena free\_paths bersifat allowlist)
+- Tidak ada file PATCH, POST, atau DELETE yang pernah allow
 
 ### 9.3 ALLOW (menulis, level L1 atau lebih)
 
@@ -220,9 +222,11 @@ test.run diizinkan untuk L1 ke atas karena belum ada aturan khusus.
 
 ### 10.1 Unit test (opa test)
 
-Hasil: PASS 32 dari 32. Rinciannya: 22 test awal (3 allow, 4 ask\_human, 15 deny) dan 10 test tambahan hasil temuan uji bypass.
+Hasil: PASS 37 dari 37. Rinciannya: 22 test awal (3 allow, 4 ask\_human, 15 deny), 10 test tambahan hasil temuan uji bypass dan 5 test tambahan hasil pemeriksaan peta akses.
 
 Test tambahan mencakup: rm -fr tanpa garis miring, redirect ke src/global.ts, force push singkat, push biasa, docker down dengan volumes, command di allowlist, allowlist yang disusupi penyambung, path huruf besar, baca .env huruf besar, dan file.write tanpa path.
+
+Test hasil pemeriksaan peta akses mencakup: PATCH/change_password.ts, POST/login.ts, POST/logout.ts, PATCH/profile.ts (semuanya deny), dan POST/masuk_ke_pembukuan.ts (ask_human).
 
 ### 10.2 Skenario fixtures (curl)
 
@@ -245,12 +249,12 @@ Tambahan: L0 menulis src/server.ts menghasilkan deny (level L0 tidak boleh file.
 | 2 | rm -fr database | allow (lolos) | deny | Unit test |
 | 3 | rm -r -f database/ | deny | deny | Manual |
 | 4 | RM -RF database/ | deny | deny | Manual |
-| 5 | find database -delete | allow (lolos) | deny (prediksi) | Belum diuji ulang |
+| 5 | find database -delete | allow (lolos) | deny | Unit test |
 | 6 | git push -f origin main | allow (lolos) | deny | Unit test |
 | 7 | git push origin main | allow (lolos) | ask\_human | Unit test |
 | 8 | cat ./.env | deny | deny | Manual |
 | 9 | docker compose down --volumes | allow (lolos) | deny | Unit test |
-| 10 | python dengan shutil.rmtree database | allow (lolos) | deny (prediksi) | Belum diuji ulang |
+| 10 | python dengan shutil.rmtree database | allow (lolos) | deny | Unit test |
 
 ### 10.4 Batch uji bypass 2 (L2, shell)
 
@@ -279,6 +283,7 @@ Dengan opa-server dihentikan, perintah cek (curl) dan cekcmd menghasilkan pesan 
 4. Blocklist command saja tidak cukup (rm -fr, find -delete, redirect, bahasa lain). Ditambah kata kunci yang lebih luas dan allowlist command.
 5. Pengecekan izin tersebar di setiap endpoint KasirKu, sehingga pemeriksaan path saja tidak cukup. Ditambah aturan isi diff D14 dan D15.
 6. Keputusan desain: .env.example ikut ditolak dibaca. Bisa dilonggarkan dengan pengecualian khusus jika agent perlu membacanya.
+7. Temuan password pada src/method\_function/PATCH/change\_password.ts
 
 ## 12. Batasan yang diketahui
 
@@ -286,7 +291,6 @@ Dengan opa-server dihentikan, perintah cek (curl) dan cekcmd menghasilkan pesan 
 - Eksekusi tidak langsung: file test atau script yang ditulis agent lalu dijalankan lewat command di allowlist. File test belum punya zona khusus.
 - False positive: kata kunci database cukup luas, sehingga command seperti bun test dengan argumen yang memuat kata itu bisa ditolak.
 - Pola .env\* hanya mencocokkan di root repo; file .env di subfolder mengandalkan aturan allowlist (ask\_human).
-- Isi folder PATCH dan POST belum diperiksa, sehingga seluruhnya ask\_human kecuali file akun.
 - Nama file bak\_list.ts dan uar\_list.ts adalah tafsiran dari isi kode.
 - adapter.py masih prototipe: membaca JSON dari stdin, level datang dari input, belum terpasang sebagai hook di agent.
 - Terlalu banyak ask\_human dapat membuat manusia menyetujui tanpa membaca.
